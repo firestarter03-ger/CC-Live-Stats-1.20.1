@@ -14,7 +14,7 @@ import net.minecraft.text.HoverEvent;
 
 public class CC_Live_Stats_Client implements ClientModInitializer {
 
-    private static final Path HOVER_TEXT = Path.get("hovertext.txt");
+    private static final Path HOVER_TEXT = Paths.get("hovertext.txt");
 
     @Override
     public void onInitializeClient() {
@@ -28,38 +28,38 @@ public class CC_Live_Stats_Client implements ClientModInitializer {
 
             return true; // Erlaubt die Anzeige der Nachricht
         });
+    }
 
-        private void extractHoverText (Text){
-            // Prüfe den Hover-Event der aktuellen Komponente
-            Style style = text.getStyle();
-            if (style != null && style.getHoverEvent() != null) {
-                HoverEvent hoverEvent = style.getHoverEvent();
+    private void extractHoverText(Text text) {
+        // Prüfe den Hover-Event der aktuellen Komponente
+        Style style = text.getStyle();
+        if (style != null && style.getHoverEvent() != null) {
+            HoverEvent hoverEvent = style.getHoverEvent();
 
-                // Prüfe, ob der Hover-Event SHOW_TEXT ist und extrahiere ihn
-                if (hoverEvent.getAction() == HoverEvent.Action.SHOW_TEXT) {
-                    Text hoverText = (Text) hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT);
-                    if (hoverText != null) {
-                        String hoverTextString = hoverText.getString();
-                        System.out.println("Hover Text gefunden: " + hoverTextString);
-                        writeToFile(hoverTextString);
-                    }
+            // Prüfe, ob der Hover-Event SHOW_TEXT ist und extrahiere ihn
+            if (hoverEvent.getAction() == HoverEvent.Action.SHOW_TEXT) {
+                Text hoverText = (Text) hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT);
+                if (hoverText != null) {
+                    String hoverTextString = hoverText.getString();
+                    System.out.println("Hover Text gefunden: " + hoverTextString);
+                    writeToFile(hoverTextString);
                 }
-            }
-
-            // Prüfe die Siblings der aktuellen Komponente
-            for (Text sibling : textComponent.getSiblings()) {
-                extractHoverText(sibling);
             }
         }
 
-        // Schreibe den Text in eine Datei
-        private void writeToFile (String message){
-            try (FileWriter writer = new FileWriter(HOVER_TEXT.toFile(), true)) {
-                writer.write(message + "\n");
-                System.out.println("In Datei gespeichert: " + message);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        // Prüfe die Siblings der aktuellen Komponente
+        for (Text sibling : text.getSiblings()) {
+            extractHoverText(sibling);
+        }
+    }
+
+    // Schreibe den Text in eine Datei
+    private void writeToFile(String message) {
+        try (FileWriter writer = new FileWriter(HOVER_TEXT.toFile(), true)) {
+            writer.write(message + "\n");
+            System.out.println("In Datei gespeichert: " + message);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
